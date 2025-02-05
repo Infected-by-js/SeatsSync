@@ -1,4 +1,5 @@
 import {createServer} from "http"
+import {initCinemaMethods} from "./methods/cinema"
 import {handleUserSubscriptions, unsubscribeUser} from "./subscriptions/user"
 import cookieParser from "cookie-parser"
 import cors from "cors"
@@ -34,7 +35,7 @@ initUserMethods(router)
 const handlersMap: Partial<Record<Namespace, WebSocketOnMessage>> = {
   user: handleUserSubscriptions,
   cinema: (ws, message) => {
-    ws.send(formatError({eid: message.eid, type: message.type, error: Errors.NotImplemented}))
+    initCinemaMethods(ws, message)
   },
   hall: (ws, message) => {
     ws.send(formatError({eid: message.eid, type: message.type, error: Errors.NotImplemented}))
