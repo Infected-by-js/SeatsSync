@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    modelValue: string | number | Array<any> | Record<string, any>
+    modelValue: any
     options: Array<any>
     optionLabel?: string
     optionValue?: string

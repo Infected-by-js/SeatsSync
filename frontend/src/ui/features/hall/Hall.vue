@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {computed, ref, watch} from "vue"
-import BaseIcon from "@/ui/common/base/BaseIcon.vue"
-import BaseSelect from "@/ui/common/base/BaseSelect.vue"
+import {computed, ref} from "vue"
 import {useCinemaStore} from "@/stores/cinema/cinema.store"
-import {toast} from "@/shared/lib/toasts-lite"
-import {calculateHallSize, createSeatsSchema} from "@/shared/utils/hall"
+import {toast} from "@/lib/toasts-lite"
+import {calculateHallSize, createSeatsSchema} from "@/utils/hall"
+import BaseIcon from "@/ui/base/BaseIcon.vue"
+import BaseSelect from "@/ui/base/BaseSelect.vue"
 import RowName from "./RowName.vue"
 import SeatPlace from "./SeatPlace.vue"
 import SeatsSchemeInfo from "./SeatsSchemeInfo.vue"
@@ -18,10 +18,10 @@ const sizes = computed(() => calculateHallSize(cinemaStore.activeHall?.seats ?? 
 
 const hoveredSeat = ref<{row: number; place: number} | null>(null)
 const selectedSeatsIds = computed(() => new Set(cinemaStore.selectedSeats.map((seat) => seat.id)))
-const availableHalls = computed(() => cinemaStore.cinema?.halls || [])
+const availableHalls = computed(() => cinemaStore.activeCinema?.halls || [])
 
 function onHallChange(hall: Hall) {
-  cinemaStore.onSelectHall(hall)
+  cinemaStore.setActiveHall(hall)
 }
 
 function onRowMouseMove(e: MouseEvent) {
@@ -42,22 +42,21 @@ function onRowMouseLeave() {
 
 function onSeatClick(e: MouseEvent) {
   const seatEl = (e.target as HTMLElement).closest("[data-seat]") as HTMLElement
+  if (!seatEl) return
 
   const seatId = Number(seatEl.dataset.seatId)
   const seatStatus = seatEl.dataset.status
   if (seatStatus === "occupied") return
 
-  if (selectedSeatsIds.value.has(seatId)) {
-    cinemaStore.selectedSeats = cinemaStore.selectedSeats.filter((seat) => seat.id !== seatId)
-  } else {
-    if (cinemaStore.selectionLimit && cinemaStore.selectedSeats.length >= cinemaStore.selectionLimit) {
-      toast.error(`You can only select up to ${cinemaStore.selectionLimit} seats`, {id: "selection-limit"})
-      return
-    }
+  const seat = cinemaStore.activeHall?.seats.find((seat) => seat.id === seatId)
+  if (!seat) return
 
-    const seat = cinemaStore.activeHall?.seats.find((seat) => seat.id === seatId)
-    if (seat) cinemaStore.selectedSeats.push(seat)
+  if (!cinemaStore.canSelectMoreSeats && !selectedSeatsIds.value.has(seatId)) {
+    toast.error(`You can only select up to ${cinemaStore.selectionLimit} seats`, {id: "selection-limit"})
+    return
   }
+
+  cinemaStore.toggleSeat(seat)
 }
 </script>
 

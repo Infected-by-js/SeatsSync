@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import {tryOnBeforeUnmount} from "@vueuse/core"
-import AppLayout from "@/ui/common/AppLayout.vue"
-import BaseCard from "@/ui/common/base/BaseCard.vue"
-import Booking from "@/ui/sections/Booking/Booking.vue"
-import Hall from "@/ui/sections/Hall"
+import {wsClient} from "@/api/ws"
+import {toast, ToastsLiteProvider} from "@/lib/toasts-lite"
+import BaseCard from "@/ui/base/BaseCard.vue"
+import SeatsBooking from "@/ui/features/booking/Booking.vue"
+import HallView from "@/ui/features/hall/Hall.vue"
+import AppLayout from "@/ui/layouts/AppLayout.vue"
 import Header from "@/ui/sections/Header.vue"
-import {wsClient} from "@/modules/ws"
-import {toast, ToastsLiteProvider} from "@/shared/lib/toasts-lite"
-import {useCinemaStore} from "./stores/cinema/cinema.store"
 
-const cinemaStore = useCinemaStore()
 let toastID: string
 
 wsClient.connectionState.subscribe(({state, prevState}) => {
@@ -34,10 +32,11 @@ tryOnBeforeUnmount(() => wsClient.destroy())
 
     <template #left>
       <BaseCard class="flex-1">
-        <Hall />
+        <HallView />
       </BaseCard>
+
       <BaseCard class="h-1/4">
-        <Booking />
+        <SeatsBooking />
       </BaseCard>
     </template>
 

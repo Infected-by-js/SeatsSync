@@ -3,18 +3,11 @@ export type Cinema = {
   name: string
   color: string
   created_at: Date
-  halls: {
-    id: number
-    name: string
-    rows: number
-    places: number
-    seats_count: number
-  }[]
+  halls: Hall[]
 }
 
 export type Hall = {
   id: number
-  created_at: Date
   cinema_id: number
   name: string
   rows: number
@@ -22,18 +15,37 @@ export type Hall = {
   seats: Seat[]
 }
 
-export type SeatStatus = "free" | "occupied"
-
 export type Seat = {
   id: number
-  created_at: Date
   hall_id: number
   row: number
   place: number
+  status: SeatStatus
+  created_at: Date
   x: number
   y: number
   width: number
   height: number
   rotation: number
-  status: SeatStatus
+}
+
+export type SeatStatus = "free" | "occupied"
+
+export type CinemaResponse = {
+  data: Cinema[]
+}
+
+export type HallResponse = {
+  data: Hall
+}
+
+export type WebSocketMessage<T = unknown> = {
+  type: string
+  data: T
+  eid?: string
+}
+
+export type WebSocketResponse<T = unknown> = {
+  data: T
+  error?: string
 }
